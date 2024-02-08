@@ -1,14 +1,26 @@
 const User = require("../models/user");
 const { StatusCodes } = require("http-status-codes");
+const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
   try {
     const { body } = req;
-    const { name, email, password } = body;
+    // const { name, email, password } = body;
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ ...body });
+    const { _id: userId, name, email } = user;
 
-    res.status(StatusCodes.CREATED).json({ user });
+    const token = jwt.sign({ userId, name }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_LIFETIME,
+    });
+
+    res
+      .status(StatusCodes.CREATED)
+      .json({
+        msg: `user created with name ${name}`,
+        token,
+        user: { name, email },
+      });
   } catch (error) {
     console.log("🚀 ~ register ~ error:", error);
   }
