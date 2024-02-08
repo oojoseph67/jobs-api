@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const { StatusCodes } = require("http-status-codes");
 const jwt = require("jsonwebtoken");
+const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 const register = async (req, res) => {
   try {
@@ -14,20 +15,40 @@ const register = async (req, res) => {
       expiresIn: process.env.JWT_LIFETIME,
     });
 
-    res
-      .status(StatusCodes.CREATED)
-      .json({
-        msg: `user created with name ${name}`,
-        token,
-        user: { name, email },
-      });
+    res.status(StatusCodes.CREATED).json({
+      msg: `user created with name ${name}`,
+      token,
+      user: { name, email },
+    });
   } catch (error) {
     console.log("🚀 ~ register ~ error:", error);
   }
 };
 
 const login = async (req, res) => {
-  res.send("login user");
+  const { body } = req;
+  const { email, password } = body;
+
+  if (!email || !password) {
+    throw new BadRequestError("Please provide both email and password");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new UnauthenticatedError("Invalid Credentials");
+  }
+
+  const { _id: userId, name: checkedName, email: checkedUserEmail } = user;
+  const token = jwt.sign({ userId, checkedName }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_LIFETIME,
+  });
+
+  res.status(StatusCodes.OK).json({
+    msg: `user exists with name ${checkedName}`,
+    token,
+    user: { checkedName, checkedUserEmail },
+  });
 };
 
 module.exports = {
