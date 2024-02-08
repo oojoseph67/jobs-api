@@ -1,3 +1,4 @@
+const { hashedPassword } = require("../utils/hash");
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
@@ -23,4 +24,9 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('User', UserSchema)
+UserSchema.pre("save", async function (next) {
+  this.password = await hashedPassword(this.password);
+  next();
+});
+
+module.exports = mongoose.model("User", UserSchema);
