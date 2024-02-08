@@ -7,4 +7,9 @@ async function hashedPassword(password) {
   return hashedPassword;
 }
 
-module.exports = { hashedPassword };
+async function unHash(requestPassword, databasePassword) {
+  const isMatch = await bcrypt.compare(requestPassword, databasePassword);
+  return isMatch;
+}
+
+module.exports = { hashedPassword, unHash };
