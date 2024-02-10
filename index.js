@@ -5,19 +5,19 @@ const app = express();
 const cors = require("cors");
 
 // extra security packages
-const helmet = require('helmet')
-const xss = require('xss-clean')
-const rateLimiter = require('express-rate-limit')
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimiter = require("express-rate-limit");
 
 // route imports
-const authRouter = require('./routes/auth')
+const authRouter = require("./routes/auth");
 const jobsRouter = require("./routes/jobs");
 
 // connectDB
-const connectDB = require('./db/index')
+const connectDB = require("./db/index");
 
 // authentication middleware
-const authenticateUser = require('./middleware/authentication')
+const authenticateUser = require("./middleware/authentication");
 
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
@@ -32,21 +32,23 @@ app.use(
 app.use(express.json());
 
 // extra packages
-app.set('trust proxy', 1)
-app.use(rateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-}))
+app.set("trust proxy", 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100,
+  })
+);
 
-app.use(helmet())
-app.use(xss())
+app.use(helmet());
+app.use(xss());
 
 // routes
 app.get("/", (req, res) => {
   res.send("jobs api");
 });
 
-app.use('/api/v1/auth', authRouter)
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/jobs", authenticateUser, jobsRouter);
 
 // middleware
@@ -57,7 +59,7 @@ const port = process.env.PORT || 7000;
 
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URI)
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );
@@ -67,3 +69,14 @@ const start = async () => {
 };
 
 start();
+
+{/** PATH UPDATE FOR SWAGGER API */}
+
+//  /user/{id}:
+//     parameters:
+//       - in: path
+//         name: id
+//         schema:
+//           type: integer
+//         required: true
+//         description: The user ID
