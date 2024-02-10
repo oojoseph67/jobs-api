@@ -4,6 +4,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
+// extra security packages
+const helmet = require('helmet')
+const xss = require('xss-clean')
+const rateLimiter = require('express-rate-limit')
+
 // route imports
 const authRouter = require('./routes/auth')
 const jobsRouter = require("./routes/jobs");
@@ -25,7 +30,16 @@ app.use(
   })
 );
 app.use(express.json());
+
 // extra packages
+app.set('trust proxy', 1)
+app.use(rateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+}))
+
+app.use(helmet())
+app.use(xss())
 
 // routes
 app.get("/", (req, res) => {
