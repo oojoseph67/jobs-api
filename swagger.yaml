@@ -1,0 +1,414 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: Jobs API Documentation
+  description: |
+    This API allows users to manage job postings. It consists of two main sections: Authentication (Auth) and Jobs.
+
+    - **Authentication (Auth):** Users need to sign up and login to access the job-related functionalities. Upon successful login, they receive an authentication token required to access the Jobs section.
+    - **Jobs:** Users can create, retrieve, update, and delete job postings.
+
+    ### Authentication
+    To access the Jobs section, users must first sign up and then log in. The login process generates an authentication token, which must be included in the header of subsequent requests to the Jobs endpoints.
+
+    ### Jobs
+    The Jobs section provides endpoints to manage job postings. Users can create new job postings, retrieve all job postings, retrieve a single job posting by ID, update a job posting, and delete a job posting.
+
+    #### Dummy Data Examples
+    - **Register User Request:**
+      ```json
+      {
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "password": "secretpassword"
+      }
+      ```
+
+    - **Login User Request:**
+      ```json
+      {
+          "email": "john.doe@example.com",
+          "password": "secretpassword"
+      }
+      ```
+
+    - **Create Job Request:**
+      ```json
+      {
+          "company": "Tech Solutions Inc.",
+          "position": "Software Engineer"
+      }
+      ```
+
+    - **Update Job Request:**
+      ```json
+      {
+          "company": "Tech Solutions Inc.",
+          "position": "Senior Software Engineer",
+          "status": "Interview Scheduled"
+      }
+      ```
+
+    - **Delete Job Request:**
+      ```json
+      {
+          "jobId": "123456789"
+      }
+      ```
+
+host: jobs-api-hcvx.onrender.com/api/v1
+basePath: /
+securityDefinitions: {}
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /auth/register:
+    post:
+      description: |
+        Register a new user.
+      summary: Register User
+      tags:
+        - Auth
+      operationId: RegisterUser
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/RegisterUserRequest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: user created with name drake
+              token:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWM2ZDM3MzFiMGIwNzUwZDY5OGFiNzkiLCJuYW1lIjoiZHJha2UiLCJpYXQiOjE3MDc1MjkwNzYsImV4cCI6MTcxMDEyMTA3Nn0.eop2tAiirP3U8Ij9Aw1Cl-pyf7GXFzSVa9nwh1LrJR0
+              user:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: drake
+                  email:
+                    type: string
+                    example: ovo12@ovo.com
+      security: []
+  /auth/login:
+    post:
+      description: |
+        Log in with existing user credentials to receive an authentication token.
+      summary: Login User
+      tags:
+        - Auth
+      operationId: LoginUser
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/LoginUserRequest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: user exists with name drake
+              token:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWM2YzMxMjI3MWFkNjdjMGExNjg2NTEiLCJjaGVja2VkTmFtZSI6ImRyYWtlIiwiaWF0IjoxNzA3NTI5MTA5LCJleHAiOjE3MTAxMjExMDl9.FwbM7WeZ3l-8nKNqVLPaHsJnHborO4Trp1VRrbMesII
+              user:
+                type: object
+                properties:
+                  checkedName:
+                    type: string
+                    example: drake
+                  checkedUserEmail:
+                    type: string
+                    example: ovo@ovo.com
+      security: []
+  /jobs:
+    post:
+      description: |
+        Create a new job posting.
+      summary: Create Job
+      tags:
+        - Jobs
+      operationId: CreateJob
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          default: Bearer {token}
+          type: string
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/CreateJobRequest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              job:
+                $ref: '#/definitions/JobResponse'
+    get:
+      description: |
+        Retrieve all job postings.
+      summary: Get All Job
+      tags:
+        - Jobs
+      operationId: GetAllJob
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          default: Bearer {token}
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              jobs:
+                type: array
+                items:
+                  $ref: '#/definitions/JobResponse'
+              count:
+                type: integer
+                example: 2
+  /jobs/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+        description: The job ID
+    get:
+      description: |
+        Retrieve a single job posting by ID.
+      summary: Get A Single Job
+      tags:
+        - Jobs
+      operationId: GetASingleJob
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          default: Bearer {token}
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/JobResponse'
+    patch:
+      description: |
+        Update an existing job posting by ID.
+      summary: Update Job
+      tags:
+        - Jobs
+      operationId: UpdateJob
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          default: Bearer {token}
+          type: string
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/UpdateJobRequest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/JobResponse'
+    delete:
+      description: |
+        Delete a job posting by ID.
+      summary: Delete Job
+      tags:
+        - Jobs
+      operationId: DeleteJob
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          default: Bearer {token}
+          type: string
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/DeleteJobRequest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+                example: job (python developerssss) for curvance ORG has been deleted
+definitions:
+  RegisterUserRequest:
+    title: RegisterUserRequest
+    example:
+      name: John Doe
+      email: john.doe@example.com
+      password: secretpassword
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    required:
+      - name
+      - email
+      - password
+  LoginUserRequest:
+    title: LoginUserRequest
+    example:
+      email: john.doe@example.com
+      password: secretpassword
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+      - email
+      - password
+  CreateJobRequest:
+    title: CreateJobRequest
+    example:
+      company: Tech Solutions Inc.
+      position: Software Engineer
+    type: object
+    properties:
+      company:
+        type: string
+      position:
+        type: string
+    required:
+      - company
+      - position
+  UpdateJobRequest:
+    title: UpdateJobRequest
+    example:
+      company: Tech Solutions Inc.
+      position: Senior Software Engineer
+      status: Interview Scheduled
+    type: object
+    properties:
+      company:
+        type: string
+      position:
+        type: string
+      status:
+        type: string
+    required:
+      - company
+      - position
+      - status
+  DeleteJobRequest:
+    title: DeleteJobRequest
+    example:
+      jobId: "123456789"
+    type: object
+    properties:
+      jobId:
+        type: string
+    required:
+      - jobId
+  JobResponse:
+    title: JobResponse
+    example:
+      _id: "65c6d4261b0b0750d698ab7c"
+      company: "curvance"
+      position: "GO developer"
+      status: "pending"
+      createdBy: "65c6d3731b0b0750d698ab79"
+      createdAt: "2024-02-10T01:40:54.477Z"
+      updatedAt: "2024-02-10T01:40:54.477Z"
+      __v: 0
+    type: object
+    properties:
+      _id:
+        type: string
+      company:
+        type: string
+      position:
+        type: string
+      status:
+        type: string
+      createdBy:
+        type: string
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+      __v:
+        type: integer
+    required:
+      - _id
+      - company
+      - position
+      - status
+      - createdBy
+      - createdAt
+      - updatedAt
+      - __v
+tags:
+  - name: Auth
+    description: Endpoints related to user authentication.
+  - name: Jobs
+    description: Endpoints related to job postings.
